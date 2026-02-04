@@ -5,8 +5,8 @@
 [![Latest Version](https://img.shields.io/packagist/v/rajpurohithitesh/amazon-creatorsapi-php-sdk)](https://packagist.org/packages/rajpurohithitesh/amazon-creatorsapi-php-sdk)
 [![Total Downloads](https://img.shields.io/packagist/dt/rajpurohithitesh/amazon-creatorsapi-php-sdk.svg?style=flat)](https://packagist.org/packages/rajpurohithitesh/amazon-creatorsapi-php-sdk)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue)](LICENSE.txt)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=RajpurohitHitesh_amazon-paapi5-php-sdk&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=RajpurohitHitesh_amazon-paapi5-php-sdk)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=RajpurohitHitesh_amazon-paapi5-php-sdk&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=RajpurohitHitesh_amazon-paapi5-php-sdk)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=RajpurohitHitesh_amazon-creatorsapi-php-sdk&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=RajpurohitHitesh_amazon-creatorsapi-php-sdk)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=RajpurohitHitesh_amazon-creatorsapi-php-sdk&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=RajpurohitHitesh_amazon-creatorsapi-php-sdk)
 [![CI](https://github.com/rajpurohithitesh/amazon-creatorsapi-php-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/rajpurohithitesh/amazon-creatorsapi-php-sdk/actions/workflows/ci.yml)
 [![PHP Composer](https://github.com/rajpurohithitesh/amazon-creatorsapi-php-sdk/actions/workflows/php.yml/badge.svg)](https://github.com/rajpurohithitesh/amazon-creatorsapi-php-sdk/actions/workflows/php.yml)
 
