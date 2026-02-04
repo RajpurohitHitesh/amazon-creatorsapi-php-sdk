@@ -1,7 +1,7 @@
 # Amazon Product Advertising API 5.0 PHP SDK
 
 ![PHP Version](https://img.shields.io/badge/PHP-8.0%2B-purple)
-[![Amazon API](https://img.shields.io/badge/Amazon%20CreatorsAPI%23FD9B15)](https://affiliate-program.amazon.in/creatorsapi/docs/en-us/introduction)
+[![Amazon API](https://img.shields.io/badge/Amazon%20CreatorsAPI-%23FD9B15)](https://affiliate-program.amazon.in/creatorsapi/docs/en-us/introduction)
 [![Latest Version](https://img.shields.io/packagist/v/rajpurohithitesh/amazon-creatorsapi-php-sdk)](https://packagist.org/packages/rajpurohithitesh/amazon-creatorsapi-php-sdk)
 [![Total Downloads](https://img.shields.io/packagist/dt/rajpurohithitesh/amazon-creatorsapi-php-sdk.svg?style=flat)](https://packagist.org/packages/rajpurohithitesh/amazon-creatorsapi-php-sdk)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue)](LICENSE.txt)
