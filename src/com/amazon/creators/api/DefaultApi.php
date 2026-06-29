@@ -218,10 +218,17 @@ class DefaultApi
         // Get OAuth2 token (creates/recreates token manager if needed)
         $token = $this->getOrCreateTokenManager()->getToken();
         
-        // Build OAuth2 headers
-        $oauthHeaders = [
-            'Authorization' => "Bearer {$token}, Version {$this->config->getVersion()}"
-        ];
+        // Build OAuth2 headers - Version suffix only for v2.x (Cognito)
+        $version = $this->config->getVersion();
+        if (str_starts_with($version, "3.")) {
+            $oauthHeaders = [
+                'Authorization' => "Bearer {$token}"
+            ];
+        } else {
+            $oauthHeaders = [
+                'Authorization' => "Bearer {$token}, Version {$version}"
+            ];
+        }
         
         return $oauthHeaders;
     }
@@ -604,7 +611,7 @@ class DefaultApi
      *
      * @throws \Amazon\CreatorsAPI\v1\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \Amazon\CreatorsAPI\v1\com\amazon\creators\model\GetFeedResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent
+     * @return \Amazon\CreatorsAPI\v1\com\amazon\creators\model\GetFeedResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent
      */
     public function getFeed($xMarketplace, $getFeedRequestContent, string $contentType = self::contentTypes['getFeed'][0])
     {
@@ -621,7 +628,7 @@ class DefaultApi
      *
      * @throws \Amazon\CreatorsAPI\v1\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \Amazon\CreatorsAPI\v1\com\amazon\creators\model\GetFeedResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Amazon\CreatorsAPI\v1\com\amazon\creators\model\GetFeedResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent, HTTP status code, HTTP response headers (array of strings)
      */
     public function getFeedWithHttpInfo($xMarketplace, $getFeedRequestContent, string $contentType = self::contentTypes['getFeed'][0])
     {
@@ -678,6 +685,12 @@ class DefaultApi
                 case 404:
                     return $this->handleResponseWithDataType(
                         '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent',
                         $request,
                         $response,
                     );
@@ -747,6 +760,14 @@ class DefaultApi
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
                         '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -1328,7 +1349,7 @@ class DefaultApi
      *
      * @throws \Amazon\CreatorsAPI\v1\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \Amazon\CreatorsAPI\v1\com\amazon\creators\model\GetReportResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent
+     * @return \Amazon\CreatorsAPI\v1\com\amazon\creators\model\GetReportResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent
      */
     public function getReport($xMarketplace, $getReportRequestContent, string $contentType = self::contentTypes['getReport'][0])
     {
@@ -1345,7 +1366,7 @@ class DefaultApi
      *
      * @throws \Amazon\CreatorsAPI\v1\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \Amazon\CreatorsAPI\v1\com\amazon\creators\model\GetReportResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Amazon\CreatorsAPI\v1\com\amazon\creators\model\GetReportResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent, HTTP status code, HTTP response headers (array of strings)
      */
     public function getReportWithHttpInfo($xMarketplace, $getReportRequestContent, string $contentType = self::contentTypes['getReport'][0])
     {
@@ -1402,6 +1423,12 @@ class DefaultApi
                 case 404:
                     return $this->handleResponseWithDataType(
                         '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent',
                         $request,
                         $response,
                     );
@@ -1471,6 +1498,14 @@ class DefaultApi
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
                         '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -2051,7 +2086,7 @@ class DefaultApi
      *
      * @throws \Amazon\CreatorsAPI\v1\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \Amazon\CreatorsAPI\v1\com\amazon\creators\model\ListFeedsResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent
+     * @return \Amazon\CreatorsAPI\v1\com\amazon\creators\model\ListFeedsResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent
      */
     public function listFeeds($xMarketplace, string $contentType = self::contentTypes['listFeeds'][0])
     {
@@ -2067,7 +2102,7 @@ class DefaultApi
      *
      * @throws \Amazon\CreatorsAPI\v1\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \Amazon\CreatorsAPI\v1\com\amazon\creators\model\ListFeedsResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Amazon\CreatorsAPI\v1\com\amazon\creators\model\ListFeedsResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent, HTTP status code, HTTP response headers (array of strings)
      */
     public function listFeedsWithHttpInfo($xMarketplace, string $contentType = self::contentTypes['listFeeds'][0])
     {
@@ -2124,6 +2159,12 @@ class DefaultApi
                 case 404:
                     return $this->handleResponseWithDataType(
                         '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent',
                         $request,
                         $response,
                     );
@@ -2193,6 +2234,14 @@ class DefaultApi
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
                         '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -2387,7 +2436,7 @@ class DefaultApi
      *
      * @throws \Amazon\CreatorsAPI\v1\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \Amazon\CreatorsAPI\v1\com\amazon\creators\model\ListReportsResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent
+     * @return \Amazon\CreatorsAPI\v1\com\amazon\creators\model\ListReportsResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent
      */
     public function listReports($xMarketplace, string $contentType = self::contentTypes['listReports'][0])
     {
@@ -2403,7 +2452,7 @@ class DefaultApi
      *
      * @throws \Amazon\CreatorsAPI\v1\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \Amazon\CreatorsAPI\v1\com\amazon\creators\model\ListReportsResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Amazon\CreatorsAPI\v1\com\amazon\creators\model\ListReportsResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ValidationExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\UnauthorizedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent|\Amazon\CreatorsAPI\v1\com\amazon\creators\model\InternalServerExceptionResponseContent, HTTP status code, HTTP response headers (array of strings)
      */
     public function listReportsWithHttpInfo($xMarketplace, string $contentType = self::contentTypes['listReports'][0])
     {
@@ -2454,6 +2503,18 @@ class DefaultApi
                 case 403:
                     return $this->handleResponseWithDataType(
                         '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent',
+                        $request,
+                        $response,
+                    );
+                case 404:
+                    return $this->handleResponseWithDataType(
+                        '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent',
                         $request,
                         $response,
                     );
@@ -2515,6 +2576,22 @@ class DefaultApi
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
                         '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\AccessDeniedExceptionResponseContent',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ResourceNotFoundExceptionResponseContent',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Amazon\CreatorsAPI\v1\com\amazon\creators\model\ThrottleExceptionResponseContent',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);

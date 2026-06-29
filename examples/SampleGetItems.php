@@ -14,12 +14,12 @@
  * permissions and limitations under the License.
  */
 
-// Run `composer install` locally before executing the following code with `php SampleGetItems.php`
-
 /**
  * Sample script demonstrating how to use the CreatorsAPI PHP SDK for GetItems API
  * GetItems operation retrieves item information for specified ASINs including
  * images, item info, offers, and other detailed product data.
+ * 
+ * Run `composer install` before executing with `php SampleGetItems.php`
  */
 
 require_once(__DIR__ . '/../vendor/autoload.php');
@@ -30,80 +30,55 @@ use Amazon\CreatorsAPI\v1\com\amazon\creators\model\GetItemsRequestContent;
 use Amazon\CreatorsAPI\v1\com\amazon\creators\model\GetItemsResource;
 use Amazon\CreatorsAPI\v1\ApiException;
 
-/**
- * Sample function to demonstrate GetItems API usage
- */
 function getItems()
 {
-    // Create configuration with OAuth2 credentials
+    // Initialize configuration with credential details
     $config = new Configuration();
-    
-    // Specify your credentials here
-    // Please add your credential id here
     $config->setCredentialId("<YOUR CREDENTIAL ID>");
-    
-    // Please add your credential secret here
     $config->setCredentialSecret("<YOUR CREDENTIAL SECRET>");
-    
-    /**
-     * Please add your credential version here
-     * For eg-
-     * - 2.1 for North America (NA) region
-     * - 2.2 for Europe (EU) region 
-     * - 2.3 for Far East (FE) region
-     */
     $config->setVersion("<YOUR CREDENTIAL VERSION>");
     
+    // Initialize API
+    $api = new DefaultApi(null, $config);
+    
+    /**
+     * Add marketplace. For more details, refer: https://affiliate-program.amazon.com/creatorsapi/docs/en-us/api-reference/common-request-headers-and-parameters#marketplace-locale-reference
+     */
+    $marketplace = "<YOUR MARKETPLACE>";
+    
+    /**
+     * Choose resources you want from GetItemsResource enum
+     * For more details, refer: https://affiliate-program.amazon.com/creatorsapi/docs/en-us/api-reference/operations/get-items#resources-parameter
+     */
+    $resources = [
+        GetItemsResource::IMAGES_PRIMARY_MEDIUM,
+        GetItemsResource::ITEM_INFO_TITLE,
+        GetItemsResource::ITEM_INFO_FEATURES,
+        GetItemsResource::OFFERS_V2_LISTINGS_PRICE,
+        GetItemsResource::OFFERS_V2_LISTINGS_AVAILABILITY,
+        GetItemsResource::OFFERS_V2_LISTINGS_CONDITION,
+        GetItemsResource::OFFERS_V2_LISTINGS_MERCHANT_INFO
+    ];
+    
+    // Create GetItems request
+    $getItemsRequest = new GetItemsRequestContent();
+    $getItemsRequest->setPartnerTag("<YOUR PARTNER TAG>");
+    $getItemsRequest->setItemIds(['B0DLFMFBJW', 'B0BFC7WQ6R', 'B00ZV9RDKK']);
+    $getItemsRequest->setResources($resources);
+    
     try {
-        // Create API instance with OAuth2 configuration
-        $apiInstance = new DefaultApi(null, $config);
-        
-        /**
-         * Specify the marketplace to which you want to send the request
-         * Eg- "www.amazon.com" for US marketplace
-         * For more details, refer: https://affiliate-program.amazon.com/creatorsapi/docs/en-us/api-reference/common-request-headers-and-parameters#marketplace-locale-reference
-         */
-        $marketplace = "<YOUR MARKETPLACE>";
-        
-        /** Please add your partner tag (store/tracking id) here */
-        $partnerTag = '<YOUR PARTNER TAG>';
-        
-        /** Choose item id(s) - ASINs to retrieve */
-        $itemIds = ['B0DLFMFBJW', 'B0BFC7WQ6R', 'B00ZV9RDKK'];
-        
-        /**
-         * Choose resources you want from GetItemsResource enum
-         * For more details, refer: https://affiliate-program.amazon.com/creatorsapi/docs/en-us/api-reference/operations/get-items#resources-parameter
-         */
-        $resources = [
-            GetItemsResource::IMAGES_PRIMARY_MEDIUM,
-            GetItemsResource::ITEM_INFO_TITLE,
-            GetItemsResource::ITEM_INFO_FEATURES,
-            GetItemsResource::OFFERS_V2_LISTINGS_PRICE,
-            GetItemsResource::OFFERS_V2_LISTINGS_AVAILABILITY,
-            GetItemsResource::OFFERS_V2_LISTINGS_CONDITION,
-            GetItemsResource::OFFERS_V2_LISTINGS_MERCHANT_INFO
-        ];
-        
-        // Create GetItems request
-        $getItemsRequest = new GetItemsRequestContent();
-        $getItemsRequest->setPartnerTag($partnerTag);
-        $getItemsRequest->setItemIds($itemIds);
-        $getItemsRequest->setResources($resources);
-        
         // Call the GetItems API
-        $response = $apiInstance->getItems($marketplace, $getItemsRequest);
+        $response = $api->getItems($marketplace, $getItemsRequest);
         
-        echo 'API called successfully.' . PHP_EOL;
-        echo "Complete Response: " . PHP_EOL . json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
+        echo "API called successfully." . PHP_EOL;
+        echo "Complete Response:" . PHP_EOL . json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
         
     } catch (ApiException $e) {
-        echo 'Error calling Creators API!' . PHP_EOL;
+        echo "Error calling Creators API!" . PHP_EOL;
         echo $e . PHP_EOL;
     } catch (Exception $e) {
         echo "Unexpected error: " . $e . PHP_EOL;
     }
 }
 
-// Run the sample
 getItems();
